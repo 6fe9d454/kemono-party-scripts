@@ -4,7 +4,6 @@ Pull all of the links/attachments from posts for a particular kemono/coomer part
 Keep note, that the links pulled from the posts, especially with link discovery on, will most likely require post processing on your own part. Unfortunately, due to the random nature of the different services people use and formatting, sometimes errant text makes its way into links (which may end up doubling the links).
 """
 
-
 import argparse
 import re
 import mimetypes
@@ -152,9 +151,7 @@ def main(args):
                     if aria_format:
                         for attachment in post["attachments"]:
                             name, path = attachment["name"], attachment["path"]
-                            attachments.append(
-                                f"https://{party}.su{path}\n out={name}"
-                            )
+                            attachments.append(f"https://{party}.su{path}\n out={name}")
                     else:
                         for attachment in post["attachments"]:
                             name, path = attachment["name"], attachment["path"]
