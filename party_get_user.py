@@ -15,7 +15,7 @@ from bs4 import BeautifulSoup
 from lxml import html
 
 PARTY_REGEX = re.compile(
-    r"(?:beta\.)?(?P<party>coomer|kemono)\.party\/(?P<service>.*)\/user\/(?P<user>.*)$",
+    r"(?:beta\.)?(?P<party>coomer|kemono)\.su\/(?P<service>.*)\/user\/(?P<user>.*)$",
     re.IGNORECASE | re.DOTALL,
 )
 LINK_REGEX = re.compile(r"(?P<url>https?://[^\s]+)")
@@ -35,16 +35,16 @@ def main(args):
     all_extensions = STANDARD_EXTS.copy()
     if additional_exts:
         all_extensions.extend(additional_exts)
-    start_page = args.start_page * 25
+    start_page = args.start_page * 50
     end_page = args.end_page
     if end_page is not None:
-        end_page = args.end_page * 25
+        end_page = args.end_page * 50
         if start_page > end_page:
             raise SystemExit("Start page is beyond end page!")
 
     def get_title(service, party, user):
         title = html.fromstring(
-            requests.get(f"https://{party}.party/{service}/user/{user}").content
+            requests.get(f"https://{party}.su/{service}/user/{user}").content
         ).xpath("//title/text()")[0]
         return re.findall(r"^Posts of (.*) from .*$", title, re.IGNORECASE | re.DOTALL)[
             0
@@ -115,11 +115,11 @@ def main(args):
         current_page = 1
         done = False
         while not done:
-            lep = f"{(end_page // 25) + 1}" if end_page is not None else "?"
+            lep = f"{(end_page // 50) + 1}" if end_page is not None else "?"
             lprefix = f"{prefix} [{current_page}/{lep}]"
             print(f"{lprefix} Fetching page {current_page} ...")
             posts = requests.get(
-                f"https://{party}.party/api/{service}/user/{user}", params={"o": o}
+                f"https://{party}.su/api/v1/{service}/user/{user}", params={"o": o}
             ).json()
 
             # Reached end
@@ -133,7 +133,7 @@ def main(args):
                     print(f"{lprefix} Reached end page!")
                     done = True
 
-            o += 25
+            o += 50
 
             post_links = []
             attachments = []
@@ -153,12 +153,12 @@ def main(args):
                         for attachment in post["attachments"]:
                             name, path = attachment["name"], attachment["path"]
                             attachments.append(
-                                f"https://{party}.party{path}\n out={name}"
+                                f"https://{party}.su{path}\n out={name}"
                             )
                     else:
                         for attachment in post["attachments"]:
                             name, path = attachment["name"], attachment["path"]
-                            attachments.append(f"https://{party}.party{path}")
+                            attachments.append(f"https://{party}.su{path}")
 
                 # Check links to see if the filename itself is a link to the hi resolution link
                 if link_discovery:
